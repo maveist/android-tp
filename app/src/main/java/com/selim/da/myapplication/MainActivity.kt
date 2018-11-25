@@ -1,21 +1,17 @@
 package com.selim.da.myapplication
 
-import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.util.Log
-import android.widget.Toast
 import com.selim.da.myapplication.fragments.DetailFragment
 import com.selim.da.myapplication.fragments.ListFragment
 import com.selim.da.myapplication.model.Book
-import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity(), ListFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener2 {
 
+    // yes we can retrieve a fragment through the supportFragmentManager.findFragmentBytag but it simpler like that
     private var currentDetailFragment: Fragment? = null
 
     override fun onCloseFragment() {
@@ -45,22 +41,18 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentInteractionList
                 .replace(R.id.list_fragment, ListFragment(), ListFragment::class.java.name).addToBackStack("list_fragment")
                 .commit()
         if(resources.configuration.orientation == 2){
-            val frag = supportFragmentManager.findFragmentByTag("detail_fragment")
-            if(frag != null){
-
-            }
             supportFragmentManager.beginTransaction()
                     .replace(R.id.detail_fragment, DetailFragment(), DetailFragment::class.java.name).addToBackStack("detail_fragment")
                     .commit()
         }else{
             supportFragmentManager.popBackStack("detail_fragment" , FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            // support to destroy the DetailFragment
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        super.onSaveInstanceState(outState, outPersistentState)
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
         if(currentDetailFragment != null) {
-            Log.i("save", "coucou")
             supportFragmentManager.putFragment(outState!!, "savedDetailFragment", currentDetailFragment!!);
         }
     }
@@ -70,10 +62,13 @@ class MainActivity : AppCompatActivity(), ListFragment.OnFragmentInteractionList
 
         val frag = supportFragmentManager.getFragment(savedInstanceState!!, "savedDetailFragment")
         if(frag != null){
-            Log.i("save", "coucouwww")
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.detail_fragment, frag, DetailFragment::class.java.name).addToBackStack("detail_fragment")
-                    .commit()
+            if(resources.configuration.orientation == 2) {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.detail_fragment, frag, DetailFragment::class.java.name).addToBackStack("detail_fragment")
+                        .commit()
+            }else {
+                supportFragmentManager.popBackStack("detail_fragment" , FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            }
         }
     }
 }

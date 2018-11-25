@@ -60,6 +60,7 @@ class ListFragment : Fragment() {
         val api = retrofit.create(LibraryService::class.java)
         var books: List<Book>? = null
         val fragment = this
+        val theContext = context
         api.listBooks().enqueue(object: Callback<List<Book>> {
             override fun onFailure(call: Call<List<Book>>, t: Throwable){
                 Timber.e("error on download data")
@@ -69,7 +70,10 @@ class ListFragment : Fragment() {
                 books = response.body()
                 val recyclerView = view!!.findViewById<RecyclerView>(R.id.recyclerView)
                 recyclerView.layoutManager = LinearLayoutManager(fragment.context)
-                recyclerView.adapter = MyBookViewHolder(context!!, books!!, {book -> onItemPressed(book)} )
+                recyclerView.adapter =
+                        MyBookViewHolder(theContext!!,
+                                books!!,
+                                { book -> onItemPressed(book) })
             }
         })
         return view
